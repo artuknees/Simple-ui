@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chivo:wght@300&family=Kanit:wght@300&family=Mulish:wght@300&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>Blockchain Management</title>
+    <style>
+        body {
+            font-family: 'Chivo', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="row mb-3">
+                <div class="col">
+                    <h1>Manage your Blockchain</h1>
+                </div>
+            </div>
+
+            <hr>
+
+            <div v-if="error" class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+
+            <div v-if="success" class="alert alert-success" role="alert">
+                {{ success }}
+            </div>
+
+            <div class="row">
+                <div class="col">
+
+                    <div>
+                        <button class="btn btn-primary" @click="onCreateWallet">
+                            Create new Wallet
+                        </button>
+                        <button class="btn btn-primary" @click="onLoadWallet">
+                            Load Wallet
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div v-if="!wallet" class="row">
+
+                <div class="col">
+                    <div class="alert alert-warning">Create a Wallet to start sending coins or to mine coins!</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                error: null,
+                success: null,
+                wallet: false,
+            },
+            computed: {
+                // only for first values
+            },
+            methods: {
+                onCreateWallet: function () {
+                    var vm = this;
+                    this.walletLoading = true
+                    axios.post('/wallet')
+                        .then(function (response) {
+                            vm.error = null;
+                            vm.success = 'Presionaste "Crear nueva" -> ' + response.data.mensaje;
+                                vm.wallet = true;
+                        })
+                        .catch(function (error) {
+                            vm.success = null;
+                            vm.error = error.response.data.message
+                        });
+                },
+
+                onLoadWallet: function () {
+                    var vm = this;
+                    axios.get('wallet')
+                        .then(function (response) {
+                                vm.error = null;
+                                vm.success = 'Public Key: ' + response.data.public_key + ', Private Key: ' + response.data.private_key;
+                                vm.wallet = true;
+                        })
+                        .catch(function (error) {
+                            vm.success = null;
+                            vm.error = error.response.data.message;
+                        });
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
